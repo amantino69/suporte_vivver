@@ -11,7 +11,7 @@ function coletarGestaoX() {
       const responsavel = tds[10]?.innerText.trim();
       const servico = tds[13]?.innerText.trim();
       if (codigo && status && responsavel && servico) {
-        dados.push({ nome: responsavel, status, canal: 'GestãoX', codigo, servico });
+        dados.push({ codigo, status, nome: responsavel, servico, canal: 'GestãoX' });
       }
     }
   });
@@ -25,7 +25,7 @@ function coletarSURI() {
     const onlineTd = row.querySelector('td:nth-child(7) .label-online');
     if (onlineTd && nameTd) {
       const nome = nameTd.innerText.trim();
-      dados.push({ nome, status: 'Online', canal: 'SURI' });
+      dados.push({ codigo: '-', status: 'Online', nome, servico: '-', canal: 'SURI' });
     }
   });
   return dados;
@@ -40,7 +40,7 @@ function coletarUcontact() {
       const estado = colunas[2].innerText.trim();
       const nome = colunas[3].innerText.trim();
       if (estado && nome) {
-        dados.push({ nome, status: estado, canal: 'Ucontact' });
+        dados.push({ codigo: '-', status: estado, nome, servico: '-', canal: 'Ucontact' });
       }
     }
   });
@@ -53,9 +53,9 @@ function exibirResumoMonitoramento() {
   const dadosUcontact = coletarUcontact();
   const todos = [...dadosGestaoX, ...dadosSURI, ...dadosUcontact];
 
-  let conteudo = 'Resumo de Monitoramento\nNome\tStatus\tCanal\tCódigo\tServiço\n';
+  let conteudo = 'Resumo de Monitoramento\nCódigo\tStatus\tResp.\tServiço\tCanal\n';
   todos.forEach(item => {
-    conteudo += `${item.nome}\t${item.status}\t${item.canal}\t${item.codigo || ''}\t${item.servico || ''}\n`;
+    conteudo += `${item.codigo}\t${item.status}\t${item.nome}\t${item.servico}\t${item.canal}\n`;
   });
 
   const popup = document.createElement('div');
