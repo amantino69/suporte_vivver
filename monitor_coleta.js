@@ -1,90 +1,61 @@
-// Arquivo novo: monitor_coleta.js
+// monitor_coleta.js
 
-// Função para coletar dados do Ucontact
-function coletarUcontact() {
-    const resultado = [];
-    const linhas = document.querySelectorAll('#tablaAgentes tr');
+function coletarGestaoX() {
+    const dados = [];
+    const linhas = document.querySelectorAll('#ctl00_MainContent_gridchamados_ctl00 tr.rgRow, #ctl00_MainContent_gridchamados_ctl00 tr.rgAltRow');
+    linhas.forEach(tr => {
+      const tds = tr.querySelectorAll('td');
+      if (tds.length >= 11) {
+        const nome = tds[10].innerText.trim();
+        const status = tds[9].innerText.trim();
+        if (nome && status) {
+          dados.push({ nome, status, canal: 'GestãoX' });
+        }
+      }
+    });
+    return dados;
+  }
   
+  function coletarSURI() {
+    const dados = [];
+    document.querySelectorAll('tbody[name="usersGrid"] tr').forEach(row => {
+      const nameTd = row.querySelector('td:nth-child(2)');
+      const onlineTd = row.querySelector('td:nth-child(7) .label-online');
+      if (onlineTd && nameTd) {
+        const nome = nameTd.innerText.trim();
+        dados.push({ nome, status: 'Online', canal: 'SURI' });
+      }
+    });
+    return dados;
+  }
+  
+  function coletarUcontact() {
+    const dados = [];
+    const linhas = document.querySelectorAll('#tablaAgentes tr');
     linhas.forEach(linha => {
       const colunas = linha.querySelectorAll('td');
       if (colunas.length >= 4) {
         const estado = colunas[2].innerText.trim();
         const nome = colunas[3].innerText.trim();
         if (estado && nome) {
-          resultado.push({ nome, status: estado, canal: 'Ucontact' });
+          dados.push({ nome, status: estado, canal: 'Ucontact' });
         }
       }
     });
-  
-    return resultado;
+    return dados;
   }
   
-  // Função para coletar dados do SURI
-  function coletarSURI() {
-    const resultado = [];
-    const linhas = document.querySelectorAll('tbody[name="usersGrid"] tr');
-  
-    linhas.forEach(row => {
-      const nome = row.querySelector('td:nth-child(2)')?.innerText.trim();
-      const online = row.querySelector('td:nth-child(7) .label-online');
-      if (nome && online) {
-        resultado.push({ nome, status: 'Online', canal: 'SURI' });
-      }
-    });
-  
-    return resultado;
-  }
-  
-  // Função para coletar dados do GestãoX
-  function coletarGestaoX() {
-    const resultado = [];
-    const linhas = document.querySelectorAll('#ctl00_MainContent_gridchamados_ctl00 tr.rgRow, #ctl00_MainContent_gridchamados_ctl00 tr.rgAltRow');
-  
-    linhas.forEach(tr => {
-      const tds = tr.querySelectorAll('td');
-      if (tds.length >= 14) {
-        const codigo = tds[0].innerText.trim();
-        const status = tds[9].innerText.trim();
-        const responsavel = tds[10].innerText.trim();
-        resultado.push({ nome: responsavel, status, canal: 'GestãoX' });
-      }
-    });
-  
-    return resultado;
-  }
-
-// Função para consolidar dados de todos os canais
-function exibirResumoMonitoramento() {
-    const dadosUcontact = coletarUcontact();
-    const dadosSURI = coletarSURI();
+  function exibirResumoMonitoramento() {
     const dadosGestaoX = coletarGestaoX();
+    const dadosSURI = coletarSURI();
+    const dadosUcontact = coletarUcontact();
+    const todos = [...dadosGestaoX, ...dadosSURI, ...dadosUcontact];
   
-    const todos = [...dadosUcontact, ...dadosSURI, ...dadosGestaoX];
+    let conteudo = 'Resumo de Monitoramento\nNome\tStatus\tCanal\n';
+    todos.forEach(item => {
+      conteudo += `${item.nome}\t${item.status}\t${item.canal}\n`;
+    });
   
-    if (todos.length === 0) {
-      alert("Nenhum dado foi coletado. Verifique se está na tela correta.");
-      return;
-    }
-  
-    // Criar HTML da tabela
-    const linhas = todos.map(item =>
-      `<tr><td>${item.nome}</td><td>${item.status}</td><td>${item.canal}</td></tr>`
-    ).join('');
-  
-    const htmlTabela = `
-      <table border="1" cellpadding="8" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
-        <thead>
-          <tr style="background-color: #eee;">
-            <th>Nome</th>
-            <th>Status</th>
-            <th>Canal</th>
-          </tr>
-        </thead>
-        <tbody>${linhas}</tbody>
-      </table>
-    `;
-  
-    // Criar o popup
     const popup = document.createElement('div');
     popup.style.position = 'fixed';
     popup.style.top = '10%';
@@ -97,12 +68,19 @@ function exibirResumoMonitoramento() {
     popup.style.maxHeight = '80%';
     popup.style.overflowY = 'auto';
     popup.style.padding = '20px';
-    popup.innerHTML = `
-      <h2>📊 Resumo de Monitoramento</h2>
-      ${htmlTabela}
-      <button style="margin-top: 10px;" onclick="this.parentNode.remove()">Fechar</button>
-    `;
+    popup.style.fontFamily = 'monospace';
+    popup.style.fontSize = '14px';
+    popup.style.whiteSpace = 'pre';
+    popup.innerHTML = '<h3>Resumo de Monitoramento</h3><pre>' + conteudo + '</pre>';
+  
+    const fechar = document.createElement('button');
+    fechar.innerText = 'Fechar';
+    fechar.style.marginTop = '10px';
+    fechar.onclick = () => document.body.removeChild(popup);
+    popup.appendChild(fechar);
   
     document.body.appendChild(popup);
   }
-    
+  
+  exibirResumoMonitoramento();
+  
