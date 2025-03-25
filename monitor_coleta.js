@@ -10,9 +10,8 @@ function coletarGestaoX() {
       const status = tds[9]?.innerText.trim();
       const responsavel = tds[10]?.innerText.trim();
       const servico = tds[13]?.innerText.trim();
-      const nome = `${codigo} - ${responsavel}`;
-      if (nome && status) {
-        dados.push({ nome, status, canal: 'GestãoX', servico });
+      if (codigo && status && responsavel && servico) {
+        dados.push({ nome: responsavel, status, canal: 'GestãoX', codigo, servico });
       }
     }
   });
@@ -54,9 +53,9 @@ function exibirResumoMonitoramento() {
   const dadosUcontact = coletarUcontact();
   const todos = [...dadosGestaoX, ...dadosSURI, ...dadosUcontact];
 
-  let conteudo = 'Resumo de Monitoramento\nNome\tStatus\tCanal\n';
+  let conteudo = 'Resumo de Monitoramento\nNome\tStatus\tCanal\tCódigo\tServiço\n';
   todos.forEach(item => {
-    conteudo += `${item.nome}\t${item.status}\t${item.canal}\n`;
+    conteudo += `${item.nome}\t${item.status}\t${item.canal}\t${item.codigo || ''}\t${item.servico || ''}\n`;
   });
 
   const popup = document.createElement('div');
