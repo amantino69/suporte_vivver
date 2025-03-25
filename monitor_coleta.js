@@ -5,17 +5,17 @@ function coletarGestaoX() {
   const linhas = document.querySelectorAll('#ctl00_MainContent_gridchamados_ctl00 tr.rgRow, #ctl00_MainContent_gridchamados_ctl00 tr.rgAltRow');
   linhas.forEach(tr => {
     const tds = tr.querySelectorAll('td');
-    if (tds.length >= 1) {
+    if (tds.length >= 11) {
       const status = tds[9]?.innerText.trim();
-      const nome = tds[3]?.innerText.split('\n').find(l => l.includes('RESPONSÁVEL:')) || '';
-      const nomeLimpo = nome.replace('RESPONSÁVEL:', '').trim();
-      if (nomeLimpo && status) {
-        dados.push({ nome: nomeLimpo, status, canal: 'GestãoX' });
+      const nome = tds[10]?.innerText.trim();
+      if (nome && status) {
+        dados.push({ nome, status, canal: 'GestãoX' });
       }
     }
   });
   return dados;
 }
+
 
 function coletarSURI() {
   const dados = [];
