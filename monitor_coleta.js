@@ -5,17 +5,19 @@ function coletarGestaoX() {
   const linhas = document.querySelectorAll('#ctl00_MainContent_gridchamados_ctl00 tr.rgRow, #ctl00_MainContent_gridchamados_ctl00 tr.rgAltRow');
   linhas.forEach(tr => {
     const tds = tr.querySelectorAll('td');
-    if (tds.length >= 11) {
+    if (tds.length >= 14) {
+      const codigo = tds[0]?.innerText.trim();
       const status = tds[9]?.innerText.trim();
-      const nome = tds[10]?.innerText.trim();
+      const responsavel = tds[10]?.innerText.trim();
+      const servico = tds[13]?.innerText.trim();
+      const nome = `${codigo} - ${responsavel}`;
       if (nome && status) {
-        dados.push({ nome, status, canal: 'GestãoX' });
+        dados.push({ nome, status, canal: 'GestãoX', servico });
       }
     }
   });
   return dados;
 }
-
 
 function coletarSURI() {
   const dados = [];
